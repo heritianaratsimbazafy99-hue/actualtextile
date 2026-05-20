@@ -62,6 +62,7 @@ test('redesigned pages include richer visual sections', () => {
   assert.match(home, /class="[^"]*commitments-section/);
   assert.doesNotMatch(home, /section dark commitments-section/);
   assert.match(home, /class="[^"]*commitment-card/);
+  assert.match(home, /class="[^"]*commitment-card-media/);
   assert.match(home, /Usine alimentée à l’énergie solaire/);
   assert.match(production, /class="[^"]*process-rail/);
   assert.match(about, /class="[^"]*mosaic-panel/);
