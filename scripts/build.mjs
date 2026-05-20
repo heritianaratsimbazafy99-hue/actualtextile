@@ -1,8 +1,10 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const publicRoot = join(root, 'public');
+const outputRoots = [root, publicRoot];
 
 const images = {
   logo: 'https://www.actualtextiles.com/wp-content/uploads/2021/11/Actual-Textiles-LOGO-300x37.png',
@@ -466,9 +468,15 @@ const esc = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&
 const hrefFor = (path) => path.startsWith('/') ? path : `/${path}`;
 
 function write(path, html) {
-  const file = join(root, path);
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, html);
+  for (const outputRoot of outputRoots) {
+    const file = join(outputRoot, path);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, html);
+  }
+}
+
+function copyStaticAssets() {
+  cpSync(join(root, 'assets'), join(publicRoot, 'assets'), { recursive: true });
 }
 
 function header(locale, currentPath, alternate) {
@@ -1253,5 +1261,7 @@ write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 ${['/', '/fr/', ...pages.map((page) => hrefFor(page.path.replace(/index\.html$/, '')))].map((url) => `  <url><loc>https://www.actualtextiles.com${url}</loc></url>`).join('\n')}
 </urlset>
 `);
+
+copyStaticAssets();
 
 console.log(`Built ${pages.length + 2} pages.`);
